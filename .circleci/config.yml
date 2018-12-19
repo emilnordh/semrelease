@@ -34,7 +34,7 @@ jobs:
       - *attach_workspace
       - add_ssh_keys:
           fingerprints:
-            - "9b:59:c6:99:87:ca:f3:31:40:17:d7:d5:cf:c1:8c:3c"
+            - "38:19:6a:03:9f:1c:71:0e:60:5f:24:dd:18:26:00:6c"
       - run: ssh-keyscan github.com >> ~/.ssh/known_hosts
       - run: echo "//npm-proxy.fury.io/acast/:_authToken=$GEMFURY_TOKEN" > ~/.npmrc
       - run: npm set registry https://npm-proxy.fury.io/acast/
