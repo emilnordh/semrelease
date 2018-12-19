@@ -1,0 +1,54 @@
+version: 2
+
+workspace_root: &workspace_root ~/semrelease
+
+attach_workspace: &attach_workspace
+  attach_workspace:
+    at: *workspace_root
+
+defaults: &defaults
+  working_directory: *workspace_root
+  docker:
+    - image: circleci/node:10-browsers
+
+jobs:
+  install:
+    <<: *defaults
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - dependencies-{{ checksum "package.json" }}
+      - run: npm install
+      - persist_to_workspace:
+          root: *workspace_root
+          paths:
+            - .
+      - save_cache:
+          key: dependencies-{{ checksum "package.json" }}
+          paths:
+            - node_modules
+  publish:
+    <<: *defaults
+    steps:
+      - *attach_workspace
+      - add_ssh_keys:
+          fingerprints:
+            - "9b:59:c6:99:87:ca:f3:31:40:17:d7:d5:cf:c1:8c:3c"
+      - run: ssh-keyscan github.com >> ~/.ssh/known_hosts
+      - run: echo "//npm-proxy.fury.io/acast/:_authToken=$GEMFURY_TOKEN" > ~/.npmrc
+      - run: npm set registry https://npm-proxy.fury.io/acast/
+      - run: npm run build
+      - run: npm run semantic-release
+
+workflows:
+  version: 2
+  build_deploy:
+    jobs:
+      - install
+      - publish:
+          requires:
+            - install
+          filters:
+            branches:
+              only: master
