@@ -38,7 +38,6 @@ jobs:
       - run: ssh-keyscan github.com >> ~/.ssh/known_hosts
       - run: echo "//npm-proxy.fury.io/acast/:_authToken=$GEMFURY_TOKEN" > ~/.npmrc
       - run: npm set registry https://npm-proxy.fury.io/acast/
-      - run: npm run build
       - run: npm run semantic-release
 
 workflows:
